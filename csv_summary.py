@@ -3,6 +3,14 @@ import csv
 import json
 
 
+def myMode(values):
+    """
+
+    :param values:
+    :return:
+    """
+    pass
+
 
 def Groups_By(set_of_names,group_by,List_csv_dict):
     """
@@ -90,38 +98,62 @@ class Summary :
             features_dict ={}
             for feature in self.json_data['features']:
                 features_dict.update(feature)
-            print(features_dict,"\n")
+            # print(features_dict,"\n")
             for group in group_columns :
                 print(group,"\n")
-                for key, value in group.items():
-                    result_group =  Group()
+                result_group = Group()
+                for key,value in group.items():
+
+                    # result_group.group_members.update({key:value})
+                    # print ("test 2 = " ,result_group.group_members)
                     if key != self.group_By:
-                        if features_dict[key]['type'] ==  'categorical' :
-                            if features_dict[key]['aggregate'] ==  'mode':
-                                result_group.group_members.update({key:})
+                        if features_dict[key]['type'] == 'categorical' :
+                            if features_dict[key]['aggregate'] ==  'mode':             #####
+                                result_group.group_members.update({key:myMode(value)})
                             elif features_dict[key]['aggregate'] ==  'union':
-                                result_group.group_members.update({key:})
+                                set_from_value= set(value)
+                                group_value = ";".join(set_from_value)
+                                # test = {}                                              #####
+                                # test.update({key:group_value})
+                                # print("test = " , test)
+                                result_group.group_members.update({key:group_value})
                             elif features_dict[key]['aggregate'] == 'unique':
-                                result_group.group_members.update({key:})
+
+                                set_from_value = set(value)
+                                result_group.group_members.update({key:len(set_from_value)})
                             elif features_dict[key]['aggregate'] == 'count':
-                                result_group.group_members.update({key:})
+                                result_group.group_members.update({key:len(value)})
                         elif features_dict[key]['type'] ==  'numerical' :
                             if features_dict[key]['aggregate'] ==  'min':
-                                result_group.group_members.update({key:})
+                                result_group.group_members.update({key:min(value)})
                             elif features_dict[key]['aggregate'] ==  'max':
-                                result_group.group_members.update({key:})
+
+                                result_group.group_members.update({key: max(value)})
                             elif features_dict[key]['aggregate'] == 'median':
-                                result_group.group_members.update({key:})
+                                value.sort()
+                                mid = len(value) // 2
+                                res = (value[mid] + value[~mid]) / 2
+
+                                result_group.group_members.update({key:res})
                             elif features_dict[key]['aggregate'] == 'mean':
-                                result_group.group_members.update({key:})
+                                if len(value) == 0 :                                  ###### prevent  divviation by 0
+                                    result_group.group_members.update({key:0})
+                                else :
+                                    res = sum(value) / len (value)
+                                    result_group.group_members.update({key:res})
                             elif features_dict[key]['aggregate'] == 'sum':
-                                result_group.group_members.update({key:})
+                                result_group.group_members.update({key:sum(value)})
                             elif features_dict[key]['aggregate'] == 'mode':
-                                result_group.group_members.update({key:})
+                                result_group.group_members.update({key:myMode(value)})
                             elif features_dict[key]['aggregate'] == 'count':
+                                result_group.group_members.update({key:len(value)})
+
                     else: result_group.name = value[0]
                 list_of_results_group.append(result_group)
+                    # print(result_group.group_members)
 
+            for g in list_of_results_group:
+                print("\n name is:  ",g.name,"\n value is : ",g.group_members)
 
 
 
