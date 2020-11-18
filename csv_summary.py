@@ -6,10 +6,25 @@ import json
 def myMode(values):
     """
 
-    :param values:
-    :return:
+    :param list of values:
+    :return:  – value which appears most (ties broken by lowest / first in alphabetical order value)
     """
-    pass
+    maxItm = -1
+    maxVal = None
+    for i in range(len(values)):
+        temp = values[i]
+        counter = 0
+        for j in range(len(values)):
+            if (values[j] == temp) and (values[j] != None):
+                values[j] = None
+                counter += 1
+        if counter > maxItm:
+            maxItm = counter
+            maxVal = temp
+        elif counter == maxItm:
+            if temp < maxVal:
+                maxVal = temp
+    return maxVal
 
 
 def Groups_By(set_of_names,group_by,List_csv_dict):
@@ -88,24 +103,16 @@ class Summary :
             for row in List_csv_dict :
                 set_of_names.add(row[self.group_By])
             data_of_all_groups = Groups_By(set_of_names,self.group_By,List_csv_dict)
-            # print(*data_of_all_groups,sep="\n\n")
             group_columns = []
             for group_data in data_of_all_groups :
                 group_columns.append(get_columns_from_group(group_data, self.features))
-            # print(group_columns)
-
             list_of_results_group = []        ###
             features_dict ={}
             for feature in self.json_data['features']:
                 features_dict.update(feature)
-            # print(features_dict,"\n")
             for group in group_columns :
-                print(group,"\n")
                 result_group = Group()
                 for key,value in group.items():
-
-                    # result_group.group_members.update({key:value})
-                    # print ("test 2 = " ,result_group.group_members)
                     if key != self.group_By:
                         if features_dict[key]['type'] == 'categorical' :
                             if features_dict[key]['aggregate'] ==  'mode':             #####
@@ -113,27 +120,22 @@ class Summary :
                             elif features_dict[key]['aggregate'] ==  'union':
                                 set_from_value= set(value)
                                 group_value = ";".join(set_from_value)
-                                # test = {}                                              #####
-                                # test.update({key:group_value})
-                                # print("test = " , test)
                                 result_group.group_members.update({key:group_value})
                             elif features_dict[key]['aggregate'] == 'unique':
-
                                 set_from_value = set(value)
                                 result_group.group_members.update({key:len(set_from_value)})
                             elif features_dict[key]['aggregate'] == 'count':
                                 result_group.group_members.update({key:len(value)})
                         elif features_dict[key]['type'] ==  'numerical' :
+                            value = [int(v) for v in value]                                 ### if the value is numerical - turn it to integer
                             if features_dict[key]['aggregate'] ==  'min':
                                 result_group.group_members.update({key:min(value)})
                             elif features_dict[key]['aggregate'] ==  'max':
-
                                 result_group.group_members.update({key: max(value)})
                             elif features_dict[key]['aggregate'] == 'median':
                                 value.sort()
                                 mid = len(value) // 2
                                 res = (value[mid] + value[~mid]) / 2
-
                                 result_group.group_members.update({key:res})
                             elif features_dict[key]['aggregate'] == 'mean':
                                 if len(value) == 0 :                                  ###### prevent  divviation by 0
@@ -150,7 +152,6 @@ class Summary :
 
                     else: result_group.name = value[0]
                 list_of_results_group.append(result_group)
-                    # print(result_group.group_members)
 
             for g in list_of_results_group:
                 print("\n name is:  ",g.name,"\n value is : ",g.group_members)
