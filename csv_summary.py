@@ -2,13 +2,17 @@
 import csv
 import json
 
+def MySort(group):
+    return group.name
 
-def myMode(values):
+def myMode(list_of_values):
     """
-
+    describtion : this function recive list and return a mone of the list
+            {the value that appears the most in it }
     :param list of values:
     :return:  – value which appears most (ties broken by lowest / first in alphabetical order value)
     """
+    values  = list_of_values            #  to protect list  from chanches
     maxItm = -1
     maxVal = None
     for i in range(len(values)):
@@ -79,6 +83,10 @@ class Group:
 
 
 
+
+
+
+
 class Summary :
     """
 
@@ -92,6 +100,7 @@ class Summary :
         with open(json_file, "r") as file:
             self.json_data = json.load(file)
             self.group_By =self.json_data['groupby']
+
 
     def getGroups(self):
         List_csv_dict = []
@@ -127,7 +136,7 @@ class Summary :
                             elif features_dict[key]['aggregate'] == 'count':
                                 result_group.group_members.update({key:len(value)})
                         elif features_dict[key]['type'] ==  'numerical' :
-                            value = [int(v) for v in value]                                 ### if the value is numerical - turn it to integer
+                            value = [int(v) for v in value]                    ### if the value is numerical-turn it to integer
                             if features_dict[key]['aggregate'] ==  'min':
                                 result_group.group_members.update({key:min(value)})
                             elif features_dict[key]['aggregate'] ==  'max':
@@ -152,14 +161,20 @@ class Summary :
 
                     else: result_group.name = value[0]
                 list_of_results_group.append(result_group)
+            list_of_results_group.sort(key=MySort)
 
             for g in list_of_results_group:
                 print("\n name is:  ",g.name,"\n value is : ",g.group_members)
+            return  list_of_results_group
+
+    def getSpec(self):
+        result = {}
 
 
 
 
 
+# [{color: [red,red,blue], kilometors: [10000,15000,55000],.... }]
 
 
 
