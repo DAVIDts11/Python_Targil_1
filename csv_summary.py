@@ -6,30 +6,30 @@ def MySort(group):
     return group.name
 
 def myMode(list_of_values):
-    """
-    describtion : this function recive list and return a mone of the list
-            {the value that appears the most in it }
-    :param list of values:
-    :return:  – value which appears most (ties broken by lowest / first in alphabetical order value)
-    """
-    values  = list_of_values            #  to protect list  from chanches
-    maxItm = -1
-    maxVal = None
-    for i in range(len(values)):
-        temp = values[i]
-        counter = 0
-        for j in range(len(values)):
-            if (values[j] == temp) and (values[j] != None):
-                values[j] = None
-                counter += 1
-        if counter > maxItm:
-            maxItm = counter
-            maxVal = temp
-        elif counter == maxItm:
-            if temp < maxVal:
-                maxVal = temp
-    return maxVal
-
+    # """
+    # describtion : this function recive list and return a mone of the list
+    #         {the value that appears the most in it }
+    # :param list of values:
+    # :return:  – value which appears most (ties broken by lowest / first in alphabetical order value)
+    # """
+    # values  = list_of_values            #  to protect list  from chanches
+    # maxItm = -1
+    # maxVal = None
+    # for i in range(len(values)):
+    #     temp = values[i]
+    #     counter = 0
+    #     for j in range(len(values)):
+    #         if (values[j] == temp) and (values[j] != None):
+    #             values[j] = None
+    #             counter += 1
+    #     if counter > maxItm:
+    #         maxItm = counter
+    #         maxVal = temp
+    #     elif counter == maxItm:
+    #         if temp < maxVal:
+    #             maxVal = temp
+    # return maxVal
+    return max(set(list_of_values), key=list_of_values.count)
 
 def Groups_By(set_of_names,group_by,List_csv_dict):
     """
@@ -94,13 +94,14 @@ class Summary :
     def __init__(self,csv_file,json_file):
         self.csv_File=csv_file
         self.json_File=json_file
+        self.set_of_names = set()
         with open(csv_file, 'r') as file:
             reader = csv.reader(file)
             self.features = tuple(next(reader))
         with open(json_file, "r") as file:
             self.json_data = json.load(file)
             self.group_By =self.json_data['groupby']
-
+        self.groups =self.getGroups()
 
     def getGroups(self):
         List_csv_dict = []
@@ -108,10 +109,9 @@ class Summary :
             csv_dict = csv.DictReader(file)
             for row in csv_dict:
                 List_csv_dict.append(dict(row))
-            set_of_names =set()
             for row in List_csv_dict :
-                set_of_names.add(row[self.group_By])
-            data_of_all_groups = Groups_By(set_of_names,self.group_By,List_csv_dict)
+                self.set_of_names.add(row[self.group_By])
+            data_of_all_groups = Groups_By(self.set_of_names,self.group_By,List_csv_dict)
             group_columns = []
             for group_data in data_of_all_groups :
                 group_columns.append(get_columns_from_group(group_data, self.features))
@@ -163,14 +163,37 @@ class Summary :
                 list_of_results_group.append(result_group)
             list_of_results_group.sort(key=MySort)
 
-            for g in list_of_results_group:
-                print("\n name is:  ",g.name,"\n value is : ",g.group_members)
+            # for g in list_of_results_group:
+            #     print("\n name is:  ",g.name,"\n value is : ",g.group_members)        #######
             return  list_of_results_group
 
     def getSpec(self):
         result = {}
+        for feature in self.features :
+            if feature == self.group_By:
+                result.update({feature: 'group by'})
+            else :
+                for f in self.json_data['features']:
+                    aggr = f.get(feature)
+                    if aggr != None:
+                        if aggr['type'] == 'textual':
+                            result.update({feature: 'textual(no aggr)'})
+                        else : result.update({feature:aggr['aggregate']})
+        return result
 
 
+    def __getitem__(self, key):
+        res = None
+        gpoups_dict = {}
+        for group in self.groups:
+            gpoups_dict.update({group.name: group})
+        for group in self.groups:
+            gpoups_dict.update({group.name: group})
+        if type(key) == int and -len(self.groups) <= key < len(self.groups):
+            res = self.groups[key]
+        elif type(key) == str and key in self.set_of_names:
+            res = gpoups_dict[key]
+        return res
 
 
 
@@ -182,7 +205,14 @@ class Summary :
 
 
 sum =  Summary('csvFile.csv','jsonFile.json')
-sum.getGroups()
+
+for g in sum.groups:
+    print("\n name is:  ",g.name,"\n value is : ",g.group_members)
+
+print("\n" , sum[-3].name ,"\n", sum[-3].group_members )
+# dict1= sum.getSpec()
+# print(dict1)
+# sum.getGroups()
 
 
 
