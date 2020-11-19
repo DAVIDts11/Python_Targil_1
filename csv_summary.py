@@ -80,10 +80,24 @@ class Group:
         self.name =''
         self.group_members={}
 
+    def __getitem__(self, key):
+        res = None
+        list = []
+        for k, v in self.group_members.items():
+            list.append({k: v})
+        if type(key) == int and -len(list) <= key < len(list):
+            res = list[key]
+        elif type(key) == str and key in self.group_members.keys():
+            res = self.group_members.get(key)
+        return res
 
+    def __iter__(self):
+        members_tuple = [(k, v) for k, v in self.group_members.items()]
+        return iter(members_tuple)
 
-
-
+    def __str__(self):
+        str = "\n name is: {self.name} \n value is : {self.group_members}".format(self=self)    
+        return  str
 
 
 
@@ -189,12 +203,14 @@ class Summary :
             gpoups_dict.update({group.name: group})
         for group in self.groups:
             gpoups_dict.update({group.name: group})
-        if type(key) == int and -len(self.groups) <= key < len(self.groups):
+        if type(key) == int and -len(self.groups) <= key < len(self.groups):    ### extention
             res = self.groups[key]
         elif type(key) == str and key in self.set_of_names:
             res = gpoups_dict[key]
         return res
 
+    def __iter__(self):
+        return iter(self.groups)
 
 
 # [{color: [red,red,blue], kilometors: [10000,15000,55000],.... }]
@@ -206,15 +222,20 @@ class Summary :
 
 sum =  Summary('csvFile.csv','jsonFile.json')
 
-for g in sum.groups:
-    print("\n name is:  ",g.name,"\n value is : ",g.group_members)
+# for g in sum.groups:
+#     print("\n name is:  ",g.name,"\n value is : ",g.group_members)
 
-print("\n" , sum[-3].name ,"\n", sum[-3].group_members )
-# dict1= sum.getSpec()
-# print(dict1)
-# sum.getGroups()
+# print("\n" , sum[-3].name ,"\n", sum[-3].group_members )
+dict1= sum.getSpec()
+print(dict1)
+a = sum.getGroups()
+print(a[0]['Color'])
 
 
+for i in a[0]:     ### to check it
+    print(i)
+
+print(a[0])
 
 
 
