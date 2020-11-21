@@ -79,6 +79,7 @@ class Group:
     def __init__(self):
         self.name =''
         self.group_members={}
+        self.featur_aggregate_dict = {}
 
     def __getitem__(self, key):
         res = None
@@ -96,7 +97,13 @@ class Group:
         return iter(members_tuple)
 
     def __str__(self):
-        str = "\n name is: {self.name} \n value is : {self.group_members}".format(self=self)    
+        # str = "\n name is: {self.name} \n value is : {self.group_members}".format(self=self)
+        # group_name – feature1 (aggregate1):value1, feature2 (aggregate2):value1, …, featureN
+
+        str ="{self.name} -".format(self=self)
+        for key,value in self.group_members.items():
+            str+= " {} ({}):{},".format(key,self.featur_aggregate_dict[key],value)
+        str = str[:-1]
         return  str
 
 
@@ -115,7 +122,9 @@ class Summary :
         with open(json_file, "r") as file:
             self.json_data = json.load(file)
             self.group_By =self.json_data['groupby']
-        self.groups =self.getGroups()
+        self.groups = []
+        # print("lala" , self.spec)
+
 
     def getGroups(self):
         List_csv_dict = []
@@ -179,6 +188,8 @@ class Summary :
 
             # for g in list_of_results_group:
             #     print("\n name is:  ",g.name,"\n value is : ",g.group_members)        #######
+            self.groups = list_of_results_group
+            self.getSpec()
             return  list_of_results_group
 
     def getSpec(self):
@@ -193,6 +204,8 @@ class Summary :
                         if aggr['type'] == 'textual':
                             result.update({feature: 'textual(no aggr)'})
                         else : result.update({feature:aggr['aggregate']})
+        for g in self.groups:
+            g.featur_aggregate_dict.update(result)
         return result
 
 
@@ -229,6 +242,7 @@ sum =  Summary('csvFile.csv','jsonFile.json')
 dict1= sum.getSpec()
 print(dict1)
 a = sum.getGroups()
+dict1= sum.getSpec()
 print(a[0]['Color'])
 
 
