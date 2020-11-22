@@ -97,9 +97,6 @@ class Group:
         return iter(members_tuple)
 
     def __str__(self):
-        # str = "\n name is: {self.name} \n value is : {self.group_members}".format(self=self)
-        # group_name – feature1 (aggregate1):value1, feature2 (aggregate2):value1, …, featureN
-
         str ="{self.name} -".format(self=self)
         for key,value in self.group_members.items():
             str+= " {} ({}):{},".format(key,self.featur_aggregate_dict[key],value)
@@ -116,17 +113,28 @@ class Summary :
         self.csv_File=csv_file
         self.json_File=json_file
         self.set_of_names = set()
-        with open(csv_file, 'r') as file:
-            reader = csv.reader(file)
-            self.features = tuple(next(reader))
-        with open(json_file, "r") as file:
-            self.json_data = json.load(file)
-            self.group_By =self.json_data['groupby']
         self.groups = []
-        # print("lala" , self.spec)
+        self.features = ()
+        try :
+            file_c = open(csv_file, 'r')
+            file_j = open(json_file, "r")
+        except:
+            print("At least one of the fies doesn't not exist")
+        else:
+            reader = csv.reader(file_c)
+            self.features = tuple(next(reader))
+            file_j = open(json_file, "r")
+            self.json_data = json.load(file_j)
+            self.group_By =self.json_data['groupby']
+            file_c.close()
+            file_j.close()
+            self.makeGroups()
 
 
     def getGroups(self):
+        return self.groups
+
+    def makeGroups(self):
         List_csv_dict = []
         with open(self.csv_File, 'r') as file:
             csv_dict = csv.DictReader(file)
@@ -147,6 +155,7 @@ class Summary :
                 for key,value in group.items():
                     if key != self.group_By:
                         if features_dict[key]['type'] == 'categorical' :
+                            value = [("NA" if v == "" else v ) for v  in value]
                             if features_dict[key]['aggregate'] ==  'mode':             #####
                                 result_group.group_members.update({key:myMode(value)})
                             elif features_dict[key]['aggregate'] ==  'union':
@@ -159,7 +168,7 @@ class Summary :
                             elif features_dict[key]['aggregate'] == 'count':
                                 result_group.group_members.update({key:len(value)})
                         elif features_dict[key]['type'] ==  'numerical' :
-                            value = [int(v) for v in value]                    ### if the value is numerical-turn it to integer
+                            value = [(0 if v == "" else int(v) )for v in value]      ### if the value is numerical-turn it to integer
                             if features_dict[key]['aggregate'] ==  'min':
                                 result_group.group_members.update({key:min(value)})
                             elif features_dict[key]['aggregate'] ==  'max':
@@ -181,13 +190,9 @@ class Summary :
                                 result_group.group_members.update({key:myMode(value)})
                             elif features_dict[key]['aggregate'] == 'count':
                                 result_group.group_members.update({key:len(value)})
-
                     else: result_group.name = value[0]
                 list_of_results_group.append(result_group)
             list_of_results_group.sort(key=MySort)
-
-            # for g in list_of_results_group:
-            #     print("\n name is:  ",g.name,"\n value is : ",g.group_members)        #######
             self.groups = list_of_results_group
             self.getSpec()
             return  list_of_results_group
@@ -208,6 +213,23 @@ class Summary :
             g.featur_aggregate_dict.update(result)
         return result
 
+    def saveSummary(self, filename,delimiter = ','):
+        if not self.groups:
+            print("There is no groups in this Summary object ")
+            return
+        file_to_write= open(filename,"w")
+        features_list = list(self.features)
+        features_list.remove(self.group_By)
+        file_to_write.write(self.group_By)
+        file_to_write.write(delimiter)
+        str1= "{}".format(delimiter) # join(self.features)
+        str1 = str1.join(features_list)
+        str1+="\n"
+        file_to_write.write(str1)
+        str2 = ""
+        for group in self.groups :
+            str2+=group.name
+
 
     def __getitem__(self, key):
         res = None
@@ -225,6 +247,11 @@ class Summary :
     def __iter__(self):
         return iter(self.groups)
 
+    def __str__(self):
+        str=""
+        for group in self.groups:
+            str+="{} \n".format(group)
+        return str
 
 # [{color: [red,red,blue], kilometors: [10000,15000,55000],.... }]
 
@@ -242,38 +269,21 @@ sum =  Summary('csvFile.csv','jsonFile.json')
 dict1= sum.getSpec()
 print(dict1)
 a = sum.getGroups()
-dict1= sum.getSpec()
-print(a[0]['Color'])
+print(sum)
 
+sum.saveSummary("lala.csv")
 
-for i in a[0]:     ### to check it
-    print(i)
+#
+# for i in a[0]:         ### to check it
+#     print(i)
+#
+# print(a[0])
 
-print(a[0])
-
-
-
-# with open('csvFile.csv', 'r') as file:
-#     reader = csv.reader(file)
-#     features = next(reader)
-#     print(features)
-#     file.seek(0)
-#     csv_dict = csv.DictReader(file)
-#     List_csv_dict = []
-#     for row in csv_dict:
-#         List_csv_dict.append(dict(row))
-#         print(List_csv_dict)
-
-with open("jsonFile.json","r") as file:
-    data = json.load(file)
-
-
-# In[ ]:
 
 
 
 
-print(data['groupby'])
+# In[ ]:
 # print(data['features'][0])
 
 
@@ -300,16 +310,3 @@ print(data['groupby'])
 
 
 
-
-#list=['lla','aa','ss','bb','ff']
-#list1=list.sort()
-
-
-# def getGroups(self):
-#     with open(self.csv_File, 'r') as file:
-#         reader = csv.reader(file)
-#         groupList = next(reader)
-#         group = Group()  # h   ??????????????
-#         group.group_members = groupList  # ???????????????
-#         groupList.sort()
-#         return groupList
