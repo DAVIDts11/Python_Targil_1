@@ -226,9 +226,16 @@ class Summary :
         str1 = str1.join(features_list)
         str1+="\n"
         file_to_write.write(str1)
-        str2 = ""
         for group in self.groups :
+            str2 = ""
             str2+=group.name
+            str2+="{}".format(delimiter)
+            for atribute in group.group_members.values():
+                str2+="{}{}".format(atribute,delimiter)
+            str2=str2[:-1]
+            str2 += "\n"
+            file_to_write.write(str2)
+
 
 
     def __getitem__(self, key):
