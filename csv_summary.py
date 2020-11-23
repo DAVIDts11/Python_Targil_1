@@ -33,9 +33,9 @@ def Groups_By(set_of_names,group_by,List_csv_dict):
 
 def get_columns_from_group(group_data,features):
     """
-
-    :param group_data:
-    :param features:
+    The function receives group and  returns dictionary that contents all the columns content as a value of the feature
+    :param group_data:   all data of the group in rows (list of rows with dict{feature_nme:feature_value} in each row )
+    :param features: list of features
     :return: dictinary {"feature[0]" : [ list with column[0] content ] ,"feature[1]" : [ list with column[1] content ]  .... .}
     """
     columns_content = {}
@@ -193,6 +193,14 @@ class Summary :
         if not self.groups:
             print("There is no groups in this Summary object ")
             return
+
+        # non_vlid_char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'\""
+        # if len(delimiter)>1 or non_vlid_char.find(delimiter) != -1 :
+        #     delimiter =","
+
+        if len(delimiter)>1 or  delimiter.isalnum() or delimiter == "'" or delimiter == '"':
+            delimiter=","
+
         file_to_write= open(filename,"w")
         features_list = list(self.features)
         features_list.remove(self.group_By)
@@ -251,7 +259,7 @@ print(dict1)
 a = sum.getGroups()
 print(sum)
 
-sum.saveSummary("lala.csv")
+sum.saveSummary("lala.csv",",")
 
 #
 # for i in a[0]:         ### to check it
