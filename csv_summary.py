@@ -5,32 +5,6 @@ import json
 def MySort(group):
     return group.name
 
-def myMode(list_of_values):
-    # """
-    # describtion : this function recive list and return a mone of the list
-    #         {the value that appears the most in it }
-    # :param list of values:
-    # :return:  – value which appears most (ties broken by lowest / first in alphabetical order value)
-    # """
-    # values  = list_of_values            #  to protect list  from chanches
-    # maxItm = -1
-    # maxVal = None
-    # for i in range(len(values)):
-    #     temp = values[i]
-    #     counter = 0
-    #     for j in range(len(values)):
-    #         if (values[j] == temp) and (values[j] != None):
-    #             values[j] = None
-    #             counter += 1
-    #     if counter > maxItm:
-    #         maxItm = counter
-    #         maxVal = temp
-    #     elif counter == maxItm:
-    #         if temp < maxVal:
-    #             maxVal = temp
-    # return maxVal
-    return max(set(list_of_values), key=list_of_values.count)
-
 def Groups_By(set_of_names,group_by,List_csv_dict):
     """
     :describtion : This function takes the dict from csv file , and group the information
@@ -156,8 +130,9 @@ class Summary :
                     if key != self.group_By:
                         if features_dict[key]['type'] == 'categorical' :
                             value = [("NA" if v == "" else v ) for v  in value]
-                            if features_dict[key]['aggregate'] ==  'mode':             #####
-                                result_group.group_members.update({key:myMode(value)})
+                            if features_dict[key]['aggregate'] ==  'mode':
+                                myMode = max(set(value), key=value.count)
+                                result_group.group_members.update({key:myMode})
                             elif features_dict[key]['aggregate'] ==  'union':
                                 set_from_value= set(value)
                                 group_value = ";".join(set_from_value)
@@ -187,7 +162,8 @@ class Summary :
                             elif features_dict[key]['aggregate'] == 'sum':
                                 result_group.group_members.update({key:sum(value)})
                             elif features_dict[key]['aggregate'] == 'mode':
-                                result_group.group_members.update({key:myMode(value)})
+                                myMode = max(set(value), key=value.count)
+                                result_group.group_members.update({key:myMode})
                             elif features_dict[key]['aggregate'] == 'count':
                                 result_group.group_members.update({key:len(value)})
                     else: result_group.name = value[0]
@@ -264,9 +240,6 @@ class Summary :
 
 
 
-
-
-
 sum =  Summary('csvFile.csv','jsonFile.json')
 
 # for g in sum.groups:
@@ -290,24 +263,30 @@ sum.saveSummary("lala.csv")
 
 
 
-# In[ ]:
-# print(data['features'][0])
-
-
-# list1=[value for value in data['features'][0].values()]
-# list2=[value for value in data['features']]
-# keys=[]
-# for i in list2 :
-#     keys.append(i.keys())
-# print(keys)
-
-# print(list1[0]['type'])
-# print(list1[0]['aggregate'])
-
-
-
-
-
+# def myMode(list_of_values):
+# """
+# describtion : this function recive list and return a mone of the list
+#         {the value that appears the most in it }
+# :param list of values:
+# :return:  – value which appears most (ties broken by lowest / first in alphabetical order value)
+# """
+# values  = list_of_values            #  to protect list  from chanches
+# maxItm = -1
+# maxVal = None
+# for i in range(len(values)):
+#     temp = values[i]
+#     counter = 0
+#     for j in range(len(values)):
+#         if (values[j] == temp) and (values[j] != None):
+#             values[j] = None
+#             counter += 1
+#     if counter > maxItm:
+#         maxItm = counter
+#         maxVal = temp
+#     elif counter == maxItm:
+#         if temp < maxVal:
+#             maxVal = temp
+# return maxVal
 
 
 
