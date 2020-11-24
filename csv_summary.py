@@ -1,3 +1,16 @@
+"""
+
+        Scientific Programming with Python
+                  Ex.1 solution
+        Submitted By:
+            Tsibulsky  David  309444065
+            Nahoom Chen 316086479
+
+
+"""
+
+
+
 
 import csv
 import json
@@ -194,8 +207,8 @@ class Summary :
             print("There is no groups in this Summary object ")
             return
 
-        # non_vlid_char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'\""
-        # if len(delimiter)>1 or non_vlid_char.find(delimiter) != -1 :
+        # non_valid_char = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'\""
+        # if len(delimiter)>1 or non_valid_char.find(delimiter) != -1 :
         #     delimiter =","
 
         if len(delimiter)>1 or  delimiter.isalnum() or delimiter == "'" or delimiter == '"':
@@ -244,28 +257,36 @@ class Summary :
             str+="{} \n".format(group)
         return str
 
-# [{color: [red,red,blue], kilometors: [10000,15000,55000],.... }]
-
-
 
 sum =  Summary('csvFile.csv','jsonFile.json')
 
-# for g in sum.groups:
-#     print("\n name is:  ",g.name,"\n value is : ",g.group_members)
 
-# print("\n" , sum[-3].name ,"\n", sum[-3].group_members )
 dict1= sum.getSpec()
 print(dict1)
 a = sum.getGroups()
 print(sum)
 
-sum.saveSummary("lala.csv",",")
+sum.saveSummary("test.csv",",")
 
-#
-# for i in a[0]:         ### to check it
-#     print(i)
-#
-# print(a[0])
+
+for i in a[0]:
+    print(i)
+
+print(a[0])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
